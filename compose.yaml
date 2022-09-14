@@ -8,7 +8,7 @@ services:
     environment:
       - PORT=19000
       - LOG_LEVEL=DEBUG
-      - API_KEY=$(API_KEY)
+      - API_KEY=$API_KEY
     volumes:
       - curt-db:/data
     networks:
