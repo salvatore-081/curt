@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   release:
-    types: [published]
+    types: [created]
 
 jobs:
   build:
@@ -23,8 +23,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: backup/do
-          file: backup/do/Dockerfile
+          file: Dockerfile
           push: true
           tags: salvatoreemilio/curt:latest,salvatoreemilio/curt:0.0.1
   deploy:
