@@ -21,10 +21,10 @@ services:
         tag: "{{.Name}}"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.public-api-nginx.loadbalancer.server.port=19000"
-      - "traefik.http.routers.public-api-nginx.rule=Host(`curt.salvatoreemilio.it`) || Host(`www.curt.salvatoreemilio.it`)"
-      - "traefik.http.routers.public-api-nginx.tls.certresolver=myresolver"
-      - "traefik.http.routers.public-api-nginx.entrypoints=websecure"
+      - "traefik.http.services.curt.loadbalancer.server.port=19000"
+      - "traefik.http.routers.curt.rule=Host(`curt.salvatoreemilio.it`) || Host(`www.curt.salvatoreemilio.it`)"
+      - "traefik.http.routers.curt.tls.certresolver=myresolver"
+      - "traefik.http.routers.curt.entrypoints=websecure"
       - "traefik.docker.network=se-default"
 
 networks:
