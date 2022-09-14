@@ -1,2 +1,7 @@
 #!/bin/bash
-/app/curt -port $port -log_level $log_level -api_key $api_key
+params=()
+[[ $PORT ]] && params+=(-PORT $PORT)
+[[ $LOG_LEVEL ]] && params+=(-LOG_LEVEL $LOG_LEVEL)
+[[ $API_KEY ]] && params+=(-API_KEY $API_KEY)
+
+/app/curt ${params[@]}

@@ -18,9 +18,9 @@ import (
 )
 
 func main() {
-	port := flag.String("port", "8080", "server port")
-	logLevel := flag.String("log_level", "MISSING", "log level")
-	apiKey := flag.String("api_key", "", "api key")
+	port := flag.String("PORT", "8080", "server port")
+	logLevel := flag.String("LOG_LEVEL", "MISSING", "log level")
+	apiKey := flag.String("API_KEY", "", "api key")
 
 	flag.Parse()
 
