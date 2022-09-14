@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  curt:
+    image: salvatoreemilio/curt:latest
+    container_name: curt
+    restart: unless-stopped
+    environment:
+      - PORT=19000
+      - LOG_LEVEL=DEBUG
+      - API_KEY=$(API_KEY)
+    volumes:
+      - curt-db:/data
+    networks:
+      - default
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024m"
+        max-file: "3"
+        tag: "{{.Name}}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.public-api-nginx.loadbalancer.server.port=19000"
+      - "traefik.http.routers.public-api-nginx.rule=Host(`curt.salvatoreemilio.it`) || Host(`www.curt.salvatoreemilio.it`)"
+      - "traefik.http.routers.public-api-nginx.tls.certresolver=myresolver"
+      - "traefik.http.routers.public-api-nginx.entrypoints=websecure"
+      - "traefik.docker.network=se-default"
+
+networks:
+  default:
+    external: true
+    name: se-default
+volumes:
+  curt-db:
+    external: true

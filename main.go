@@ -20,6 +20,7 @@ import (
 func main() {
 	port := flag.String("port", "8080", "server port")
 	logLevel := flag.String("log_level", "MISSING", "log level")
+	apiKey := flag.String("api_key", "", "api key")
 
 	flag.Parse()
 
@@ -71,25 +72,6 @@ func main() {
 		}
 	}()
 
-	db.View(func(txn *badger.Txn) error {
-		opts := badger.DefaultIteratorOptions
-		opts.PrefetchSize = 10
-		it := txn.NewIterator(opts)
-		defer it.Close()
-		for it.Rewind(); it.Valid(); it.Next() {
-			item := it.Item()
-			k := item.Key()
-			err := item.Value(func(v []byte) error {
-				fmt.Printf("key=%s, value=%s\n", k, v)
-				return nil
-			})
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-
 	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.New()
@@ -131,6 +113,24 @@ func main() {
 
 	r.POST("/", func(c *gin.Context) {
 		var body models.Body
+		var header models.Header
+
+		if len(*apiKey) > 0 {
+			e := c.ShouldBindHeader(&header)
+			if e != nil {
+				c.JSON(http.StatusBadRequest, map[string]string{
+					"message": e.Error(),
+				})
+				return
+			}
+
+			if header.ApiKey != *apiKey {
+				c.JSON(http.StatusUnauthorized, map[string]string{
+					"message": "wrong api_key",
+				})
+				return
+			}
+		}
 
 		if e := c.ShouldBindJSON(&body); e != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{
