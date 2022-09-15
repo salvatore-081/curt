@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  curt:
+    image: salvatoreemilio/curt:latest
+    container_name: curt
+    environment:
+      - PORT=19000
+      - LOG_LEVEL=DEBUG
+      - API_KEY=your_apy_key
+      - HOST=http://localhost:19000/
+    volumes:
+      - curt-db:/data
+    ports:
+      - 19000:19000
+
+volumes:
+  curt-db:

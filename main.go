@@ -21,6 +21,7 @@ func main() {
 	port := flag.String("PORT", "8080", "server port")
 	logLevel := flag.String("LOG_LEVEL", "MISSING", "log level")
 	apiKey := flag.String("API_KEY", "", "api key")
+	host := flag.String("HOST", "http://localhost:8080/", "host")
 
 	flag.Parse()
 
@@ -154,6 +155,7 @@ func main() {
 		if e == nil {
 			c.JSON(http.StatusCreated, map[string]string{
 				"curt": key,
+				"url":  *host + key,
 			})
 			return
 		}
@@ -166,6 +168,6 @@ func main() {
 		}
 	})
 
-	log.Info().Str("service", "CURT").Msg("listening and serving HTTP on " + *port)
+	log.Info().Str("service", "CURT").Msg("listening and serving HTTP on port " + *port)
 	r.Run(":" + *port)
 }
