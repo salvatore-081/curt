@@ -21,7 +21,7 @@ Or use a [docker-compose](./examples/compose.yaml) version
         "url":"url_to_shorten"
     }
     ```
-    remember to insert API key in Header
+    remember to insert an API key in the header if you configured it in the env variable
 - Response
     ```JSON
     {
