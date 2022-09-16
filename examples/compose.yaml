@@ -7,7 +7,7 @@ services:
     environment:
       - PORT=19000
       - LOG_LEVEL=DEBUG
-      - API_KEY=your_apy_key
+      - API_KEY=your_api_key
       - HOST=http://localhost:19000/
     volumes:
       - curt-db:/data
