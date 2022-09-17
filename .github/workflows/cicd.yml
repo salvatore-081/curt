@@ -25,7 +25,7 @@ jobs:
         with:
           file: Dockerfile
           push: true
-          tags: salvatoreemilio/curt:latest,salvatoreemilio/curt:0.0.2
+          tags: salvatoreemilio/curt:latest,salvatoreemilio/curt:0.0.3
   deploy:
     needs: [build]
     runs-on: ubuntu-latest

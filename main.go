@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/salvatore-081/curt/internal/middlewares"
-	"github.com/salvatore-081/curt/pkg/key"
 	"github.com/salvatore-081/curt/pkg/models"
+	"github.com/teris-io/shortid"
 )
 
 func main() {
@@ -60,6 +60,12 @@ func main() {
 		log.Fatal().Str("service", "DB").Err(e).Msg("")
 	}
 	defer db.Close()
+
+	sid, e := shortid.New(1, shortid.DefaultABC, 2342)
+	if e != nil {
+		log.Fatal().Str("service", "ID").Err(e).Msg("")
+	}
+	shortid.SetDefault(sid)
 
 	ticker := time.NewTicker(1 * time.Hour)
 	defer ticker.Stop()
@@ -140,9 +146,16 @@ func main() {
 			return
 		}
 
-		key := key.RandStringBytesMaskImprSrcUnsafe(7) // TODO
+		// key := key.RandStringBytesMaskImprSrcUnsafe(7) // TO DELETE
+		key, e := shortid.Generate()
+		if e != nil {
+			c.JSON(http.StatusInternalServerError, map[string]string{
+				"message": e.Error(),
+			})
+			return
+		}
 
-		e := db.Update(func(txn *badger.Txn) error {
+		e = db.Update(func(txn *badger.Txn) error {
 			var entry *badger.Entry
 			if body.TTL != nil {
 				entry = badger.NewEntry([]byte(key), []byte(body.Url)).WithTTL(time.Hour * time.Duration(*body.TTL))
