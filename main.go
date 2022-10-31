@@ -21,7 +21,7 @@ func main() {
 	port := flag.String("PORT", "8080", "server port")
 	logLevel := flag.String("LOG_LEVEL", "MISSING", "log level")
 	apiKey := flag.String("API_KEY", "", "api key")
-	host := flag.String("HOST", "http://localhost:8080/", "host")
+	host := flag.String("HOST", "http://localhost:8080", "host")
 
 	flag.Parse()
 
@@ -84,7 +84,74 @@ func main() {
 	r := gin.New()
 	r.Use(middlewares.GinLoggerMiddleware())
 
-	r.GET("/:key", func(c *gin.Context) {
+	r.GET("/c", func(c *gin.Context) {
+		log.Info().Msg("/c")
+		var header models.Header
+
+		if len(*apiKey) > 0 {
+			e := c.ShouldBindHeader(&header)
+			if e != nil {
+				c.JSON(http.StatusBadRequest, map[string]string{
+					"message": e.Error(),
+				})
+				return
+			}
+
+			if header.ApiKey != *apiKey {
+				c.JSON(http.StatusUnauthorized, map[string]string{
+					"message": "wrong api_key",
+				})
+				return
+			}
+		}
+
+		curts := []models.Curt{}
+
+		e := db.View(func(txn *badger.Txn) error {
+			opts := badger.DefaultIteratorOptions
+			opts.AllVersions = false
+			opts.PrefetchSize = 10
+			it := txn.NewIterator(opts)
+			defer it.Close()
+			for it.Rewind(); it.Valid(); it.Next() {
+				item := it.Item()
+				var ttl *uint16
+				var expiresAt *uint64
+				if item.ExpiresAt() > 0 {
+					ttl = new(uint16)
+					expiresAt = new(uint64)
+					*expiresAt = item.ExpiresAt()
+					*ttl = uint16(time.Until(time.Unix(int64(*expiresAt), 0)).Hours())
+				}
+				k := item.Key()
+				e := item.Value(func(v []byte) error {
+					curts = append(curts, models.Curt{Url: string(v), Key: string(k), Curt: fmt.Sprintf("%s/c/%s", *host, k), TTL: ttl, ExpiresAt: expiresAt})
+					return nil
+				})
+				if e != nil {
+					return e
+				}
+			}
+			return nil
+		})
+
+		if e == nil {
+			c.JSON(http.StatusOK, curts)
+			return
+		}
+
+		switch e {
+		default:
+			c.JSON(http.StatusInternalServerError, map[string]string{
+				"message": e.Error(),
+			})
+		}
+
+	})
+
+	r.GET("/c/:key", func(c *gin.Context) {
+		log.Info().Msg("/c/:key")
+
 		var v []byte
 		e := db.View(func(txn *badger.Txn) error {
 			item, e := txn.Get([]byte(c.Param("key")))
@@ -118,7 +185,7 @@ func main() {
 		}
 	})
 
-	r.POST("/", func(c *gin.Context) {
+	r.POST("/c/", func(c *gin.Context) {
 		var body models.Body
 		var header models.Header
 
@@ -146,7 +213,6 @@ func main() {
 			return
 		}
 
-		// key := key.RandStringBytesMaskImprSrcUnsafe(7) // TO DELETE
 		key, e := shortid.Generate()
 		if e != nil {
 			c.JSON(http.StatusInternalServerError, map[string]string{
@@ -166,10 +232,14 @@ func main() {
 			return e
 		})
 		if e == nil {
-			c.JSON(http.StatusCreated, map[string]string{
+			response := map[string]string{
 				"curt": key,
-				"url":  *host + key,
-			})
+				"url":  *host + "/" + key,
+			}
+			if body.TTL != nil {
+				response["TTL"] = fmt.Sprintf("%d", *body.TTL)
+			}
+			c.JSON(http.StatusCreated, response)
 			return
 		}
 
