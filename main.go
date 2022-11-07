@@ -135,7 +135,7 @@ func main() {
 				}
 				k := item.Key()
 				e := item.Value(func(v []byte) error {
-					curts = append(curts, models.Curt{Url: string(v), Key: string(k), Curt: fmt.Sprintf("%sc/%s", *host, k), TTL: ttl, ExpiresAt: expiresAt})
+					curts = append(curts, models.Curt{Url: string(v), Key: string(k), Curt: fmt.Sprintf("%s/c/%s", *host, k), TTL: ttl, ExpiresAt: expiresAt})
 					return nil
 				})
 				if e != nil {
