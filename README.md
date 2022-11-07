@@ -26,8 +26,9 @@ Or use a [docker-compose](./examples/compose.yaml) version
 - Response
   ```JSON
   {
-      "curt": "generated_key",
-      "url": "http://localhost:19000/c/generated_key"
+      "key": "generated_key",
+      "curt": "http://localhost:19000/c/generated_key",
+      "url": "url_to_shorten"
   }
   ```
 
