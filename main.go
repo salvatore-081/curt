@@ -95,7 +95,6 @@ func main() {
 	r.Use(middlewares.GinLoggerMiddleware())
 
 	r.GET("/c", func(c *gin.Context) {
-		log.Info().Msg("/c")
 		var header models.Header
 
 		if len(*apiKey) > 0 {
@@ -160,8 +159,6 @@ func main() {
 	})
 
 	r.GET("/c/:key", func(c *gin.Context) {
-		log.Info().Msg("/c/:key")
-
 		var v []byte
 		e := db.View(func(txn *badger.Txn) error {
 			item, e := txn.Get([]byte(c.Param("key")))
@@ -183,7 +180,6 @@ func main() {
 
 		switch e {
 		case badger.ErrKeyNotFound:
-			log.Info().Msg("not found")
 			c.JSON(http.StatusNotFound, map[string]string{
 				"message": "not found",
 				"details": e.Error(),
