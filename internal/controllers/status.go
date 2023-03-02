@@ -49,7 +49,7 @@ func About(g *gin.RouterGroup, r *internal.Resolver) {
 
 		modules := []models.Module{{
 			Path:    "Curt",
-			Version: "1.1.0-rc.2",
+			Version: "1.1.0-rc.3",
 		}}
 
 		for _, module := range info.Deps {
