@@ -39,8 +39,6 @@ func main() {
 	xAPIKey := flag.String("X_API_KEY", "", "X-API-Key")
 	host := flag.String("HOST", "http://localhost:8080", "host")
 
-	docs.SwaggerInfo.Host = *host
-
 	flag.Parse()
 
 	logOutput := zerolog.ConsoleWriter{Out: os.Stdout}
@@ -102,6 +100,7 @@ func main() {
 	controllers.C(g.Group("/c"), &r)
 	controllers.Status(g.Group("/status"), &r)
 
+	docs.SwaggerInfo.Host = r.Host
 	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL(*host+"/swagger/doc.json")))
 
 	log.Info().Str("service", "CURT").Msg("listening and serving HTTP on port " + *port)
