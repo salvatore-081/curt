@@ -18,7 +18,7 @@ func (r *Resolver) Create(host string, apiKey string) (e error) {
 	r.Host = host
 	r.ApiKey = apiKey
 
-	r.BadgerDB, e = badger.Open(badger.DefaultOptions("../data").WithLogger(middlewares.BadgerLogger{}))
+	r.BadgerDB, e = badger.Open(badger.DefaultOptions("./data").WithLogger(middlewares.BadgerLogger{}))
 	if e != nil {
 		return e
 	}
