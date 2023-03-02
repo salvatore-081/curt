@@ -8,31 +8,13 @@ import (
 	badger "github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/salvatore-081/curt/internal"
+	"github.com/salvatore-081/curt/internal/middlewares"
 	"github.com/salvatore-081/curt/pkg/models"
 	"github.com/teris-io/shortid"
 )
 
 func C(g *gin.RouterGroup, r *internal.Resolver) {
-	g.GET("", func(c *gin.Context) {
-		var header models.Header
-
-		if len(r.ApiKey) > 0 {
-			e := c.ShouldBindHeader(&header)
-			if e != nil {
-				c.JSON(http.StatusBadRequest, map[string]string{
-					"message": e.Error(),
-				})
-				return
-			}
-
-			if header.ApiKey != r.ApiKey {
-				c.JSON(http.StatusUnauthorized, map[string]string{
-					"message": "wrong api_key",
-				})
-				return
-			}
-		}
-
+	g.GET("", middlewares.GinAuthMiddleware(r.ApiKey), func(c *gin.Context) {
 		curts := []models.Curt{}
 
 		e := r.BadgerDB.View(func(txn *badger.Txn) error {
@@ -110,27 +92,8 @@ func C(g *gin.RouterGroup, r *internal.Resolver) {
 		}
 	})
 
-	g.POST("", func(c *gin.Context) {
+	g.POST("", middlewares.GinAuthMiddleware(r.ApiKey), func(c *gin.Context) {
 		var body models.Body
-		var header models.Header
-
-		if len(r.ApiKey) > 0 {
-			e := c.ShouldBindHeader(&header)
-			if e != nil {
-				c.JSON(http.StatusBadRequest, map[string]string{
-					"message": e.Error(),
-				})
-				return
-			}
-
-			if header.ApiKey != r.ApiKey {
-				c.JSON(http.StatusUnauthorized, map[string]string{
-					"message": "wrong api_key",
-				})
-				return
-			}
-		}
-
 		if e := c.ShouldBindJSON(&body); e != nil {
 			c.JSON(http.StatusBadRequest, map[string]string{
 				"message": e.Error(),

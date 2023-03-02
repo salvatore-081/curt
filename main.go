@@ -83,6 +83,7 @@ func main() {
 	g.Use(middlewares.GinLoggerMiddleware())
 
 	controllers.C(g.Group("/c"), &r)
+	controllers.Status(g.Group("/status"), &r)
 
 	log.Info().Str("service", "CURT").Msg("listening and serving HTTP on port " + *port)
 
