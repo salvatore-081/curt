@@ -140,7 +140,6 @@ func CPost(g *gin.RouterGroup, r *internal.Resolver) {
 // @Failure 404,500 {object} models.GenericError
 // @Router /c/{key} [get]
 // @Param key path string true "Curt Key"
-// @Security X-API-Key
 func CGetKey(g *gin.RouterGroup, r *internal.Resolver) {
 	g.GET("/:key", func(c *gin.Context) {
 		var v []byte
