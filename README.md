@@ -9,7 +9,7 @@ Free and open-source self-hosted url shortener service written in Go.
 Run in a terminal:
 
 ```docker
-docker run -v curt-db:/data --name curt -p 19000:19000 -e PORT=19000 -e LOG_LEVEL=DEBUG -e API_KEY=your_api_key -e HOST=http://localhost:19000 salvatoreemilio/curt:latest
+docker run -v curt-db:/data --name curt -p 19000:19000 -e PORT=19000 -e LOG_LEVEL=DEBUG -e X_API_KEY=your_X-API-Key -e HOST=http://localhost:19000 salvatoreemilio/curt:latest
 ```
 
 Or use a [docker-compose](./examples/compose.yaml) version
