@@ -12,16 +12,33 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	_ "github.com/salvatore-081/curt/docs"
 	"github.com/salvatore-081/curt/internal"
 	"github.com/salvatore-081/curt/internal/controllers"
 	"github.com/salvatore-081/curt/internal/middlewares"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/teris-io/shortid"
 )
 
+// @title Curt API
+// @version 1.1.0
+// @contact.name Salvatore Emilio
+// @contact.url http://salvatoreemilio.it
+// @contact.email @info@salvatoreemilio.it
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host curt.salvatoreemilio.it
+// @BasePath /
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
+// @securitydefinitions.apikey X-API-Key
+// @in header
+// @name X-API-Key
 func main() {
 	port := flag.String("PORT", "8080", "server port")
 	logLevel := flag.String("LOG_LEVEL", "MISSING", "log level")
-	apiKey := flag.String("API_KEY", "", "api_key")
+	xAPIKey := flag.String("X_API_KEY", "", "X-API-Key")
 	host := flag.String("HOST", "http://localhost:8080", "host")
 
 	flag.Parse()
@@ -55,7 +72,7 @@ func main() {
 	zerolog.SetGlobalLevel(l)
 
 	var r internal.Resolver
-	e = r.Create(*host, *apiKey)
+	e = r.Create(*host, *xAPIKey)
 	if e != nil {
 		log.Fatal().Str("service", "badgerDB").Err(e).Msg("")
 	}
@@ -74,7 +91,7 @@ func main() {
 	g.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "api_key"},
+		AllowHeaders:     []string{"Origin", "X-API-Key"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -84,6 +101,8 @@ func main() {
 
 	controllers.C(g.Group("/c"), &r)
 	controllers.Status(g.Group("/status"), &r)
+
+	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL(*host+"/swagger/doc.json")))
 
 	log.Info().Str("service", "CURT").Msg("listening and serving HTTP on port " + *port)
 

@@ -11,17 +11,39 @@ import (
 )
 
 func Status(g *gin.RouterGroup, r *internal.Resolver) {
-	g.GET("/am-i-up", middlewares.GinAuthMiddleware(r.ApiKey), func(c *gin.Context) {
+	Health(g, r)
+	About(g, r)
+}
+
+// @Tags status
+// @Summary Health check
+// @Produce  plain/text
+// @Success 200 {string} string	"OK"
+// @Failure 500 {object} models.GenericError
+// @Router /status/health [get]
+// @Security X-API-Key
+func Health(g *gin.RouterGroup, r *internal.Resolver) {
+	g.GET("/health", middlewares.GinAuthMiddleware(r.XAPIKey), func(c *gin.Context) {
 		c.JSON(200, "OK")
 	})
+}
 
-	g.GET("/about", middlewares.GinAuthMiddleware(r.ApiKey), func(c *gin.Context) {
+// @Tags status
+// @Summary About
+// @Produce  json
+// @Success 200 {object} []models.Module
+// @Failure 500 {object} models.GenericError
+// @Router /status/about [get]
+// @Security X-API-Key
+func About(g *gin.RouterGroup, r *internal.Resolver) {
+	g.GET("/about", middlewares.GinAuthMiddleware(r.XAPIKey), func(c *gin.Context) {
 		info, ok := debug.ReadBuildInfo()
 
 		if !ok {
-			c.JSON(http.StatusInternalServerError, map[string]string{
-				"message": "unable to read build info",
-			})
+			c.JSON(http.StatusInternalServerError,
+				models.GenericError{
+					Message: "unable to read build info",
+				})
 			return
 		}
 

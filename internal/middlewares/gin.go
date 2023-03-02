@@ -42,24 +42,26 @@ func GinLoggerMiddleware() gin.HandlerFunc {
 	}
 }
 
-func GinAuthMiddleware(apiKey string) gin.HandlerFunc {
+func GinAuthMiddleware(xAPIKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var header models.Header
 
-		if len(apiKey) > 0 {
+		if len(xAPIKey) > 0 {
 			e := c.ShouldBindHeader(&header)
 			if e != nil {
-				c.JSON(http.StatusBadRequest, map[string]string{
-					"message": e.Error(),
-				})
+				c.JSON(http.StatusBadRequest,
+					models.GenericError{
+						Message: e.Error(),
+					})
 				c.Abort()
 				return
 			}
 
-			if header.ApiKey != apiKey {
-				c.JSON(http.StatusUnauthorized, map[string]string{
-					"message": "wrong api_key",
-				})
+			if header.XApiKey != xAPIKey {
+				c.JSON(http.StatusUnauthorized,
+					models.GenericError{
+						Message: "wrong X-API-Key",
+					})
 				c.Abort()
 				return
 			}

@@ -1,0 +1,156 @@
+basePath: /
+definitions:
+  models.Curt:
+    properties:
+      TTL:
+        type: integer
+      curt:
+        type: string
+      expiresAt:
+        type: integer
+      key:
+        type: string
+      url:
+        type: string
+    type: object
+  models.GenericError:
+    properties:
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  models.Module:
+    properties:
+      info:
+        type: string
+      path:
+        type: string
+      replace:
+        $ref: '#/definitions/models.Module'
+      sum:
+        type: string
+    type: object
+host: curt.salvatoreemilio.it
+info:
+  contact:
+    email: '@info@salvatoreemilio.it'
+    name: Salvatore Emilio
+    url: http://salvatoreemilio.it
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Curt API
+  version: 1.1.0
+paths:
+  /c:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Curt'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.GenericError'
+      security:
+      - X-API-Key: []
+      summary: List all Curt(s)
+      tags:
+      - c
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Curt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.GenericError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.GenericError'
+      security:
+      - X-API-Key: []
+      summary: Create a new Curt
+      tags:
+      - c
+  /c/{key}:
+    get:
+      parameters:
+      - description: Curt Key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "301":
+          description: Moved Permanently
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.GenericError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.GenericError'
+      security:
+      - X-API-Key: []
+      summary: Follow a Curt redirect
+      tags:
+      - c
+  /status/about:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Module'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.GenericError'
+      security:
+      - X-API-Key: []
+      summary: About
+      tags:
+      - status
+  /status/health:
+    get:
+      produces:
+      - plain/text
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.GenericError'
+      security:
+      - X-API-Key: []
+      summary: Health check
+      tags:
+      - status
+securityDefinitions:
+  X-API-Key:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"
