@@ -13,8 +13,6 @@
         },
         "version": "1.1.0"
     },
-    "host": "curt.salvatoreemilio.it",
-    "basePath": "/",
     "paths": {
         "/c": {
             "get": {
@@ -85,11 +83,6 @@
         },
         "/c/{key}": {
             "get": {
-                "security": [
-                    {
-                        "X-API-Key": []
-                    }
-                ],
                 "produces": [
                     "application/json"
                 ],

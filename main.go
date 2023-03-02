@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/salvatore-081/curt/docs"
 	_ "github.com/salvatore-081/curt/docs"
 	"github.com/salvatore-081/curt/internal"
 	"github.com/salvatore-081/curt/internal/controllers"
@@ -28,8 +29,6 @@ import (
 // @contact.email @info@salvatoreemilio.it
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host curt.salvatoreemilio.it
-// @BasePath /
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 // @securitydefinitions.apikey X-API-Key
@@ -40,6 +39,8 @@ func main() {
 	logLevel := flag.String("LOG_LEVEL", "MISSING", "log level")
 	xAPIKey := flag.String("X_API_KEY", "", "X-API-Key")
 	host := flag.String("HOST", "http://localhost:8080", "host")
+
+	docs.SwaggerInfo.Host = *host
 
 	flag.Parse()
 

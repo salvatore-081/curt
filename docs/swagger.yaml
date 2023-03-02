@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   models.Curt:
     properties:
@@ -31,7 +30,6 @@ definitions:
       sum:
         type: string
     type: object
-host: curt.salvatoreemilio.it
 info:
   contact:
     email: '@info@salvatoreemilio.it'
@@ -105,8 +103,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.GenericError'
-      security:
-      - X-API-Key: []
       summary: Follow a Curt redirect
       tags:
       - c
