@@ -13,7 +13,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/salvatore-081/curt/docs"
-	_ "github.com/salvatore-081/curt/docs"
 	"github.com/salvatore-081/curt/internal"
 	"github.com/salvatore-081/curt/internal/controllers"
 	"github.com/salvatore-081/curt/internal/middlewares"
