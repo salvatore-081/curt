@@ -17,6 +17,7 @@ func C(g *gin.RouterGroup, r *internal.Resolver) {
 	CGet(g, r)
 	CPost(g, r)
 	CGetKey(g, r)
+	CDelete(g, r)
 }
 
 // @Tags c
@@ -78,7 +79,8 @@ func CGet(g *gin.RouterGroup, r *internal.Resolver) {
 // @Produce  json
 // @Success 200 {object} models.Curt
 // @Failure 400,500 {object} models.GenericError
-// @Router /c [post]
+// @Param message body models.Body true "Curt Data"
+// @Router /c [post] models.Body
 // @Security X-API-Key
 func CPost(g *gin.RouterGroup, r *internal.Resolver) {
 	g.POST("", middlewares.GinAuthMiddleware(r.XAPIKey), func(c *gin.Context) {
@@ -102,7 +104,7 @@ func CPost(g *gin.RouterGroup, r *internal.Resolver) {
 
 		e = r.BadgerDB.Update(func(txn *badger.Txn) error {
 			var entry *badger.Entry
-			if body.TTL != nil {
+			if body.TTL != nil && *body.TTL > 0 {
 				entry = badger.NewEntry([]byte(key), []byte(body.Url)).WithTTL(time.Hour * time.Duration(*body.TTL))
 			} else {
 				entry = badger.NewEntry([]byte(key), []byte(body.Url))
@@ -111,16 +113,61 @@ func CPost(g *gin.RouterGroup, r *internal.Resolver) {
 			return e
 		})
 		if e == nil {
-			response := map[string]string{
-				"key":  key,
-				"curt": r.Host + "/c/" + key,
-				"url":  body.Url,
+			curt := models.Curt{
+				Key:  key,
+				Curt: r.Host + "/c/" + key,
+				Url:  body.Url,
 			}
 			if body.TTL != nil {
-				response["TTL"] = fmt.Sprintf("%d", *body.TTL)
+				curt.TTL = body.TTL
+				expiresAt := uint64(time.Now().Add(time.Hour * time.Duration(*body.TTL)).Unix())
+				curt.ExpiresAt = &expiresAt
 			}
-			c.JSON(http.StatusCreated, response)
+			c.JSON(http.StatusCreated, curt)
 			return
+		}
+
+		switch e {
+		default:
+			c.JSON(http.StatusInternalServerError,
+				models.GenericError{
+					Message: e.Error(),
+				})
+		}
+	})
+}
+
+// @Tags c
+// @Summary Delete a Curt
+// @Produce  json
+// @Success 200 {object} models.Curt
+// @Failure 404,500 {object} models.GenericError
+// @Router /c/{key} [delete]
+// @Param key path string true "Curt Key"
+func CDelete(g *gin.RouterGroup, r *internal.Resolver) {
+	g.DELETE("/:key", middlewares.GinAuthMiddleware(r.XAPIKey), func(c *gin.Context) {
+		txn := r.BadgerDB.NewTransaction(true)
+		defer txn.Discard()
+
+		_, e := txn.Get([]byte(c.Param("key")))
+		if e != nil {
+			c.JSON(http.StatusNotFound,
+				models.GenericError{
+					Message: "not found",
+					Details: e.Error(),
+				})
+			return
+		}
+
+		e = txn.Delete([]byte(c.Param("key")))
+		if e == nil {
+			e = txn.Commit()
+			if e == nil {
+				c.JSON(http.StatusOK, models.Curt{
+					Key: c.Param("key"),
+				})
+				return
+			}
 		}
 
 		switch e {

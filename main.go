@@ -22,7 +22,7 @@ import (
 )
 
 // @title Curt API
-// @version 1.1.0
+// @version 1.2.0
 // @contact.name Salvatore Emilio
 // @contact.url http://salvatoreemilio.it
 // @contact.email @info@salvatoreemilio.it

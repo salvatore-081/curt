@@ -68,6 +68,17 @@ const docTemplate = `{
                     "c"
                 ],
                 "summary": "Create a new Curt",
+                "parameters": [
+                    {
+                        "description": "Curt Data",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Body"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -111,6 +122,44 @@ const docTemplate = `{
                 "responses": {
                     "301": {
                         "description": "Moved Permanently"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.GenericError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.GenericError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "c"
+                ],
+                "summary": "Delete a Curt",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Curt Key",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Curt"
+                        }
                     },
                     "404": {
                         "description": "Not Found",
@@ -192,6 +241,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Body": {
+            "type": "object",
+            "required": [
+                "url"
+            ],
+            "properties": {
+                "TTL": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Curt": {
             "type": "object",
             "properties": {
@@ -252,7 +315,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.1.0",
+	Version:          "1.2.0",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},

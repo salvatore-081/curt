@@ -1,4 +1,13 @@
 definitions:
+  models.Body:
+    properties:
+      TTL:
+        type: integer
+      url:
+        type: string
+    required:
+    - url
+    type: object
   models.Curt:
     properties:
       TTL:
@@ -39,7 +48,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Curt API
-  version: 1.1.0
+  version: 1.2.0
 paths:
   /c:
     get:
@@ -62,6 +71,13 @@ paths:
       tags:
       - c
     post:
+      parameters:
+      - description: Curt Data
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/models.Body'
       produces:
       - application/json
       responses:
@@ -83,6 +99,31 @@ paths:
       tags:
       - c
   /c/{key}:
+    delete:
+      parameters:
+      - description: Curt Key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Curt'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.GenericError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.GenericError'
+      summary: Delete a Curt
+      tags:
+      - c
     get:
       parameters:
       - description: Curt Key
